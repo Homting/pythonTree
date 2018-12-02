@@ -12,16 +12,27 @@ _level = 3
 # show hidden, default value is False.
 _hidden = True
 
-def listTree(rootDir=_rootDir, level=_level, hidden=_hidden):
-    for dirName, subdirList, fileList in os.walk(rootDir):
-        if dirName.startswith(".") and _hidden:
-            #print(dirName)
+def isHidden(f):
+    if f.split("\\")[-1].startswith("."):
+        return True
+    return False
+
+
+def dfs_showdir(path, depth):
+    if depth == 0:
+        print("root:[" + path + "]")
+
+    if depth >= _level:
+        return
+
+    for item in os.listdir(path):
+        if item.startswith(".") and _hidden:
             continue
-        print("Folder: %s" % dirName)
-        for fname in fileList:
-            if fname.startswith(".") and _hidden:
-                continue
-            print("\t%s" % fname)
+        print("|      " * depth + "+--" + item)
+
+        newitem = path +'/'+ item
+        if os.path.isdir(newitem):
+            dfs_showdir(newitem, depth +1)
 
 def usage():
     print ("-------------------------------------------")
@@ -46,5 +57,6 @@ if __name__ == "__main__":
             print("show all files including hidden files and folders")
             _hidden = False
         if parameter in ("-l","--level"):
-            _level = value
-    listTree(_rootDir, _level, _hidden)
+            _level = int(value)
+    #listTree(_rootDir, _level, _hidden)
+    dfs_showdir(_rootDir,0)
